@@ -22,16 +22,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVR
 
-
-# Define a function to extract raster values for a given point from a TIFF file
-def extract_raster_values(point, raster_file):
-    longitude = point['geometry'].x
-    latitude = point['geometry'].y
-    with rio.open(raster_file) as src:
-        row, col = src.index(longitude, latitude)
-        value = src.read(1)[row, col]  # Assuming single band raster
-    return value
-
 st.set_page_config(layout="wide")
 
 st.title("Build your model")
@@ -46,6 +36,10 @@ def trainModel(selected_model, driving_factors):
     y = df['Monthly_avg_ground_data (µg/m³)']
     x = df.drop(columns=['Monthly_avg_ground_data (µg/m³)',"NAME", "geometry", "Month", "LandUse_0", "LandUse_3", "LandUse_13", "LandUse_14", "LandUse_15", "LandUse_24"])
 
+    for key in driving_factors:
+        if not driving_factors[key]:
+            x.drop(key, axis=1, inplace=True)
+
 
     # Split the data into training and testing sets
     x_train, x_test, y_train, y_test = train_test_split(x, y, train_size=0.7, random_state = 31)
@@ -58,8 +52,6 @@ def trainModel(selected_model, driving_factors):
 
     np.random.seed(55)
 
-    
-    
     if selected_model == "GBR":
         # Define the parameter grid
         param_grid = {
@@ -174,7 +166,21 @@ def trainModel(selected_model, driving_factors):
 
     return best_model, r2, mae, mse, mape, rmse
 
+# Custom CSS to style the button with red borders
+st.markdown("""
+    <style>
+    div.stButton > button:first-child {
+        border: 2px solid red;  /* Red border */
+        padding: 10px 24px;
+        font-size: 16px;
+        border-radius: 8px;
+    }
 
+    div.stButton > button:hover {
+        border: 2px solid red;  /* Ensure red border on hover too */
+    }
+    </style>
+""", unsafe_allow_html=True)
 
 with col1:
     models = ["Linear regression", "SVM", "Random Forest", "GBR"]
@@ -192,12 +198,15 @@ with col1:
     temperature = st.checkbox("Temperature")
     windSpeed = st.checkbox("Wind Speed")
 
-    best_model, r2, mae, mse, mape, rmse = trainModel(selected_model, [tropomi, elevation, rainfall, population, viirs, temperature, windSpeed])
-    st.write("R2 score: ", r2)
-    st.write("Mean Absolute Error (MAE):", mae)
-    st.write("Mean Squared Error (MSE):", mse)
-    st.write("Mean Absolute Percentage Error (MAPE):", mape)
-    st.write("Root Mean Squared Error (RMSE):" , rmse)
+        # Create a "Train Model" button
+    if st.button("Train model"):
+        # Call trainModel function when the button is clicked
+        best_model, r2, mae, mse, mape, rmse = trainModel(selected_model, {"NO2 (mol/m^2)": tropomi, "Elevation": elevation, "Rainfall": rainfall, "Population": population, "VIIRS": viirs, "Temperature": temperature, "WindSpeed": windSpeed})
+        st.write("R2 score: ", r2)
+        st.write("Mean Absolute Error (MAE):", mae)
+        st.write("Mean Squared Error (MSE):", mse)
+        st.write("Mean Absolute Percentage Error (MAPE):", mape)
+        st.write("Root Mean Squared Error (RMSE):" , rmse)    
 
     
 with col2:
