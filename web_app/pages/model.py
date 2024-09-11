@@ -8,6 +8,9 @@ from sklearn.linear_model import LinearRegression
 from sklearn.svm import SVR
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+import folium
+from folium.plugins import HeatMap
+import streamlit.components.v1 as components
 
 
 class ModelTrainer:
@@ -123,6 +126,37 @@ class ModelTrainer:
         mape = self.mean_absolute_percentage_error(y_test, y_pred)
         rmse = mean_squared_error(y_test, y_pred, squared=False)
         return {"R2": r2, "MAE": mae, "MSE": mse, "MAPE": mape, "RMSE": rmse}
+    
+
+class Visualiser:
+    def __init__(self, model, driving_factors) -> None:
+        self.model = model
+        self.driving_factors = driving_factors
+        self.grid_df = pd.read_csv("/home/brij/studies/sem7/airPollution/Project_Elective/web_app/blr.csv")
+    
+    def foliumMap(self):
+        features = []
+        for key in self.driving_factors:
+            if self.driving_factors[key]:
+                features.append(key)
+
+        self.grid_df['NO2_prediction'] = self.model.predict(self.grid_df[features])
+
+        # Create a base map centered around the city
+        lat_min, lat_max = 12.85, 13.20
+        lon_min, lon_max = 77.45, 77.80
+        m = folium.Map(location=[(lat_min + lat_max) / 2, (lon_min + lon_max) / 2], zoom_start=12)
+
+        # Convert predictions to a list of [latitude, longitude, NO2] for HeatMap
+        heat_data = [[row['latitude'], row['longitude'], row['NO2_prediction']] for index, row in self.grid_df.iterrows()]
+
+        # Add the heatmap layer
+        HeatMap(heat_data, radius=10).add_to(m)
+
+        # Save the map as an HTML string to be displayed in Streamlit
+        map_html = m._repr_html_()
+        return map_html
+
 
 
 class App:
@@ -136,6 +170,10 @@ class App:
             st.session_state["metrics_col1"] = None
         if "metrics_col2" not in st.session_state:
             st.session_state["metrics_col2"] = None
+        if "viz_col1" not in st.session_state:
+            st.session_state["viz_col1"] = None
+        if "viz_col2" not in st.session_state:
+            st.session_state["viz_col2"] = None
 
         col1, col2 = st.columns(2)
 
@@ -171,6 +209,8 @@ class App:
 
                 # Store results in session state
                 st.session_state["metrics_col1"] = metrics
+                viz = Visualiser(model, driving_factors)
+                st.session_state["viz_col1"] = viz
 
             # Display results of model 1 if available
             if st.session_state["metrics_col1"]:
@@ -180,6 +220,12 @@ class App:
                 st.write("Mean Squared Error (MSE):", st.session_state["metrics_col1"]["MSE"])
                 st.write("Mean Absolute Percentage Error (MAPE):", st.session_state["metrics_col1"]["MAPE"])
                 st.write("Root Mean Squared Error (RMSE):", st.session_state["metrics_col1"]["RMSE"])
+
+            if st.session_state["viz_col1"]:
+                map_html = st.session_state["viz_col1"].foliumMap()
+
+                # Display the map in Streamlit using st.components.v1.html()
+                st.components.v1.html(map_html, height=600)
 
         # Column 2
         with col2:
@@ -213,6 +259,8 @@ class App:
 
                 # Store results in session state
                 st.session_state["metrics_col2"] = metrics
+                viz = Visualiser(model, driving_factors)
+                st.session_state["viz_col2"] = viz
 
             # Display results of model 2 if available
             if st.session_state["metrics_col2"]:
@@ -222,7 +270,12 @@ class App:
                 st.write("Mean Squared Error (MSE):", st.session_state["metrics_col2"]["MSE"])
                 st.write("Mean Absolute Percentage Error (MAPE):", st.session_state["metrics_col2"]["MAPE"])
                 st.write("Root Mean Squared Error (RMSE):", st.session_state["metrics_col2"]["RMSE"])
-                
+            
+            if st.session_state["viz_col2"]:
+                map_html = st.session_state["viz_col2"].foliumMap()
+
+                # Display the map in Streamlit using st.components.v1.html()
+                st.components.v1.html(map_html, height=600)
 
 if __name__ == "__main__":
     app = App()
