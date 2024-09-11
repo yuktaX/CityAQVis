@@ -16,76 +16,140 @@ with col2:
     Map2 = geemap.Map(center=(13, 77.5), zoom=9)
     Map2.to_streamlit(height=600)
 
-'''
-    points = gpd.read_file('../DownloadTest/stations.shp')
+# Define the boundaries of the city (latitude and longitude)
+lat_min, lat_max = 12.85, 13.20  # Example for a city like Bangalore
+lon_min, lon_max = 77.45, 77.80
 
-    #Driving factors
-    points['NO2'] = None
-    points['Elevation'] = None
-    points['Rainfall'] = None
-    points['Population'] = None
-    points['VIIRS'] = None
-    # points['LandUse'] = None
-    points['Temperature'] = None
-    points['WindSpeed'] = None
+# Define the grid resolution (distance between points in degrees)
+grid_size = 0.01  # Adjust as needed
 
-    months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
-    no2_raster_files = [f'../DownloadTest/no2_{month}.tif' for month in months]
-    rainfall_raster_files = [f'../DownloadTest/rainfall_{month}.tif' for month in months]
-    viirs_raster_files = [f'../DownloadTest/viirs_{month}.tif' for month in months]
-    wind_raster_files = [f'../DownloadTest/windspeed_{month}.tif' for month in months]
-    temp_raster_files = [f'../DownloadTest/temp_{month}.tif' for month in months]
+# Create the grid points
+lat_grid = np.arange(lat_min, lat_max, grid_size)
+lon_grid = np.arange(lon_min, lon_max, grid_size)
+grid_points = [(lat, lon) for lat in lat_grid for lon in lon_grid]
 
-    NO2_raster = rio.open('../DownloadTest/no2Test2.tif')
-    NO2_arr = NO2_raster.read(1)
-    Elevation_raster = rio.open('../DownloadTest/elevationTest1.tif')
-    Elevation_arr = Elevation_raster.read(1)
-    Rainfall_raster = rio.open('../DownloadTest/rainTest1.tif')
-    Rainfall_arr = Rainfall_raster.read(1)
-    Pop_raster = rio.open('../DownloadTest/populationTest1.tif')
-    Pop_arr = Pop_raster.read(1)
+# Convert to DataFrame
+grid_df = pd.DataFrame(grid_points, columns=['latitude', 'longitude'])
 
-    # Landuse_raster = rio.open('../DownloadTest/categoricalUse.tif')
-    # Landuse_arr = Landuse_raster.read(1)
+ee.Authenticate() 
+ee.Initialize(project='ee-brijdesai2003')
 
-    count=0
+no2_dataset = ee.ImageCollection('COPERNICUS/S5P/OFFL/L3_NO2') \
+              .filterDate('2023-01-01', '2023-01-31') \
+              .select('tropospheric_NO2_column_number_density') \
+              .mean()  # Get the average for the month
 
-    for index,row in points.iterrows(): #iterate over the points in the shapefile
-        longitude=row['geometry'].x #get the longitude of the point
-        latitude=row['geometry'].y  #get the latitude of the point
+elevation_dataset = ee.Image('CGIAR/SRTM90_V4')
 
-        rowIndex, colIndex = NO2_raster.index(longitude,latitude) # the corresponding pixel to the point (longitude,latitude)
+rainfall_dataset = ee.ImageCollection("IDAHO_EPSCOR/TERRACLIMATE") \
+                  .filterDate('2023-01-01', '2023-01-31') \
+                  .select('pr') \
+                  .mean()
 
-        # Extract the raster values at the point location
-        points['NO2'].loc[index] = NO2_arr[rowIndex, colIndex]
-        points['Elevation'].loc[index] = Elevation_arr[rowIndex, colIndex]
-        points['Population'].loc[index] = Pop_arr[rowIndex, colIndex]
-        points['Rainfall'].loc[index] = Rainfall_arr[rowIndex, colIndex]
-        # points['LandUse'].loc[index] = Landuse_arr[rowIndex, colIndex]
-        #points['VIIRS'].loc[index] = Rainfall_arr[rowIndex, colIndex]
+population_dataset = ee.ImageCollection("CIESIN/GPWv411/GPW_Population_Count") \
+                        .filterDate('2020-01-01', '2020-12-31') \
+                        .mean()
 
-    new_rows = []
+viirs_dataset = ee.ImageCollection('NOAA/VIIRS/DNB/MONTHLY_V1/VCMCFG') \
+                        .filterDate('2023-01-01', '2023-01-31') \
+                        .select('avg_rad') \
+                        .mean()
 
-    for _, point in points.iterrows():
-        for month, no2_file, rainfall_file, viirs_file, temp_file, wind_file in zip(months, no2_raster_files, rainfall_raster_files, viirs_raster_files, temp_raster_files, wind_raster_files):
-            no2_value = extract_raster_values(point, no2_file)
-            rainfall_value = extract_raster_values(point, rainfall_file)
-            viirs_value = extract_raster_values(point, viirs_file)
-            temp_value = extract_raster_values(point, temp_file)
-            wind_value = extract_raster_values(point, wind_file)
-            new_row = {
-                'geometry': point['geometry'],
-                'NAME': point['NAME'],
-                'NO2': no2_value,
-                'Elevation': point['Elevation'],
-                'Rainfall': rainfall_value,
-                'Population': point['Population'],
-                'VIIRS':viirs_value,
-                # 'LandUse': point['LandUse'],
-                'Temperature':temp_value,
-                'WindSpeed':wind_value,
-            }
-            new_rows.append(new_row)
+# landuse_dataset = ee.Image("JRC/GHSL/P2023A/GHS_BUILT_C/2018")
 
-    new_points = gpd.GeoDataFrame(new_rows, crs=points.crs)
-'''
+temperature_dataset = ee.ImageCollection("IDAHO_EPSCOR/TERRACLIMATE") \
+                  .filterDate('2023-01-01', '2023-01-31') \
+                  .select('tmmx') \
+                  .mean()
+
+windspeed_dataset = ee.ImageCollection("IDAHO_EPSCOR/TERRACLIMATE") \
+                  .filterDate('2023-01-01', '2023-01-31') \
+                  .select('vs') \
+                  .mean()
+
+# Define a function to get data from Earth Engine for a single point
+def get_ee_data(lat, lon):
+    point = ee.Geometry.Point(lon, lat)
+
+    # Get NO2 data from TROPOMI
+    no2_value = no2_dataset.reduceRegion(
+        reducer=ee.Reducer.mean(),
+        geometry=point,
+        scale=3000
+    ).get('tropospheric_NO2_column_number_density').getInfo()
+
+    # Example: Get Elevation data
+    elevation_value = elevation_dataset.reduceRegion(
+        reducer=ee.Reducer.mean(),
+        geometry=point,
+        scale=3000
+    ).get('elevation').getInfo()
+
+    # Get Rainfall data from TerraClimate
+    rainfall_value = rainfall_dataset.reduceRegion(
+        reducer=ee.Reducer.mean(),
+        geometry=point,
+        scale=3000
+    ).get('pr').getInfo()
+
+    # Get Population data from CIESIN
+
+    population_value = population_dataset.reduceRegion(
+        reducer=ee.Reducer.mean(),
+        geometry=point,
+        scale=3000
+    ).get('population_count').getInfo()
+
+    # Get VIIRS Nighttime Lights data
+    viirs_value = viirs_dataset.reduceRegion(
+        reducer=ee.Reducer.mean(),
+        geometry=point,
+        scale=3000
+    ).get('avg_rad').getInfo()
+
+     # Get Land Use data from GHS Built-Up Grid
+    # landuse_value = landuse_dataset.reduceRegion(
+    #     reducer=ee.Reducer.mean(),
+    #     geometry=point,
+    #     scale=1000
+    # ).get('built_characteristics').getInfo()
+
+    temperature_value = temperature_dataset.reduceRegion(
+        reducer=ee.Reducer.mean(),
+        geometry=point,
+        scale=3000
+    ).get('tmmx').getInfo()
+
+    windspeed_value = windspeed_dataset.reduceRegion(
+        reducer=ee.Reducer.mean(),
+        geometry=point,
+        scale=3000
+    ).get('vs').getInfo()
+
+    return no2_value, elevation_value, rainfall_value, population_value, viirs_value, temperature_value, windspeed_value
+
+    # Add other data sources similarly...
+
+grid_df[['NO2 (mol/m^2)', 'Elevation', 'Rainfall', 'Population', 'VIIRS', 'Temperature', 'WindSpeed']] = grid_df.apply(lambda row: get_ee_data(row['latitude'], row['longitude']), axis=1, result_type='expand')
+
+csv_filename = 'blr.csv'
+grid_df.to_csv(csv_filename, index=False)
+
+features = ['NO2 (mol/m^2)', 'Elevation', 'Rainfall', 'Population', 'VIIRS', 'Temperature', 'WindSpeed']
+grid_df['NO2_prediction'] = best_model.predict(grid_df[features])
+
+import folium
+from folium.plugins import HeatMap
+
+# Create a base map centered around the city
+m = folium.Map(location=[(lat_min + lat_max) / 2, (lon_min + lon_max) / 2], zoom_start=12)
+
+# Convert predictions to a list of [latitude, longitude, NO2] for HeatMap
+heat_data = [[row['latitude'], row['longitude'], row['NO2_prediction']] for index, row in grid_df.iterrows()]
+
+# Add the heatmap layer
+HeatMap(heat_data, radius=10).add_to(m)
+
+# Save map to HTML file or display directly
+m.save('no2_heatmap.html')
+m

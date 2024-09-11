@@ -128,28 +128,35 @@ class ModelTrainer:
 class App:
     def __init__(self):
         st.set_page_config(layout="wide")
-        st.title("Build your model")
+        st.title("Build your models")
 
     def render(self):
+        # Initialize session state variables if they don't exist
+        if "metrics_col1" not in st.session_state:
+            st.session_state["metrics_col1"] = None
+        if "metrics_col2" not in st.session_state:
+            st.session_state["metrics_col2"] = None
+
         col1, col2 = st.columns(2)
 
+        # Column 1
         with col1:
             models = ["Linear regression", "SVM", "Random Forest", "GBR"]
-            selected_model = st.selectbox("Model:", models)
+            selected_model = st.selectbox("Model:", models, key="model_col1")
 
             pollutants = ["NO2", "SO2", "CH4"]
-            selected_pollutant = st.selectbox("Pollutant:", pollutants)
+            selected_pollutant = st.selectbox("Pollutant:", pollutants, key="pollutant_col1")
 
             st.write("Driving Factors")
-            tropomi = st.checkbox("TROPOMI")
-            elevation = st.checkbox("Elevation")
-            rainfall = st.checkbox("Rainfall")
-            population = st.checkbox("Population")
-            viirs = st.checkbox("Night-time lights")
-            temperature = st.checkbox("Temperature")
-            wind_speed = st.checkbox("Wind Speed")
+            tropomi = st.checkbox("TROPOMI", key="tropomi_col1")
+            elevation = st.checkbox("Elevation", key="elevation_col1")
+            rainfall = st.checkbox("Rainfall", key="rainfall_col1")
+            population = st.checkbox("Population", key="population_col1")
+            viirs = st.checkbox("Night-time lights", key="viirs_col1")
+            temperature = st.checkbox("Temperature", key="temperature_col1")
+            wind_speed = st.checkbox("Wind Speed", key="windspeed_col1")
 
-            if st.button("Train model"):
+            if st.button("Train model", key="train_model_col1"):
                 driving_factors = {
                     "NO2 (mol/m^2)": tropomi,
                     "Elevation": elevation,
@@ -162,15 +169,60 @@ class App:
                 trainer = ModelTrainer(selected_model, driving_factors)
                 model, metrics = trainer.train_model()
 
-                st.write("R2 score: ", metrics["R2"])
-                st.write("Mean Absolute Error (MAE):", metrics["MAE"])
-                st.write("Mean Squared Error (MSE):", metrics["MSE"])
-                st.write("Mean Absolute Percentage Error (MAPE):", metrics["MAPE"])
-                st.write("Root Mean Squared Error (RMSE):", metrics["RMSE"])
+                # Store results in session state
+                st.session_state["metrics_col1"] = metrics
 
+            # Display results of model 1 if available
+            if st.session_state["metrics_col1"]:
+                st.write("### Model 1 Results:")
+                st.write("R2 score: ", st.session_state["metrics_col1"]["R2"])
+                st.write("Mean Absolute Error (MAE):", st.session_state["metrics_col1"]["MAE"])
+                st.write("Mean Squared Error (MSE):", st.session_state["metrics_col1"]["MSE"])
+                st.write("Mean Absolute Percentage Error (MAPE):", st.session_state["metrics_col1"]["MAPE"])
+                st.write("Root Mean Squared Error (RMSE):", st.session_state["metrics_col1"]["RMSE"])
+
+        # Column 2
         with col2:
-            st.write("Train and show results")
+            models = ["Linear regression", "SVM", "Random Forest", "GBR"]
+            selected_model = st.selectbox("Model:", models, key="model_col2")
 
+            pollutants = ["NO2", "SO2", "CH4"]
+            selected_pollutant = st.selectbox("Pollutant:", pollutants, key="pollutant_col2")
+
+            st.write("Driving Factors")
+            tropomi = st.checkbox("TROPOMI", key="tropomi_col2")
+            elevation = st.checkbox("Elevation", key="elevation_col2")
+            rainfall = st.checkbox("Rainfall", key="rainfall_col2")
+            population = st.checkbox("Population", key="population_col2")
+            viirs = st.checkbox("Night-time lights", key="viirs_col2")
+            temperature = st.checkbox("Temperature", key="temperature_col2")
+            wind_speed = st.checkbox("Wind Speed", key="windspeed_col2")
+
+            if st.button("Train model", key="train_model_col2"):
+                driving_factors = {
+                    "NO2 (mol/m^2)": tropomi,
+                    "Elevation": elevation,
+                    "Rainfall": rainfall,
+                    "Population": population,
+                    "VIIRS": viirs,
+                    "Temperature": temperature,
+                    "WindSpeed": wind_speed
+                }
+                trainer = ModelTrainer(selected_model, driving_factors)
+                model, metrics = trainer.train_model()
+
+                # Store results in session state
+                st.session_state["metrics_col2"] = metrics
+
+            # Display results of model 2 if available
+            if st.session_state["metrics_col2"]:
+                st.write("### Model 2 Results:")
+                st.write("R2 score: ", st.session_state["metrics_col2"]["R2"])
+                st.write("Mean Absolute Error (MAE):", st.session_state["metrics_col2"]["MAE"])
+                st.write("Mean Squared Error (MSE):", st.session_state["metrics_col2"]["MSE"])
+                st.write("Mean Absolute Percentage Error (MAPE):", st.session_state["metrics_col2"]["MAPE"])
+                st.write("Root Mean Squared Error (RMSE):", st.session_state["metrics_col2"]["RMSE"])
+                
 
 if __name__ == "__main__":
     app = App()
