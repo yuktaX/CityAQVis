@@ -13,6 +13,7 @@ from folium.plugins import HeatMap
 import streamlit.components.v1 as components
 
 
+
 class ModelTrainer:
     def __init__(self, model_name, driving_factors):
         self.model_name = model_name
@@ -20,7 +21,8 @@ class ModelTrainer:
         self.df = self.load_data()
 
     def load_data(self):
-        df = pd.read_csv("/home/brij/studies/sem7/airPollution/Project_Elective/web_app/DownloadTest/DownloadTest/with_ground(in).csv", encoding='unicode_escape')
+        #df = pd.read_csv("/home/brij/studies/sem7/airPollution/Project_Elective/web_app/DownloadTest/DownloadTest/with_ground(in).csv", encoding='unicode_escape')
+        df = pd.read_csv("/home/yukta/College/sem7/RE-Work-Jaya/Project_Elective_Sem6/web_app/DownloadTest/DownloadTest/with_ground(in).csv", encoding='unicode_escape')
         df = df.dropna()
         return df
 
@@ -132,7 +134,7 @@ class Visualiser:
     def __init__(self, model, driving_factors) -> None:
         self.model = model
         self.driving_factors = driving_factors
-        self.grid_df = pd.read_csv("/home/brij/studies/sem7/airPollution/Project_Elective/web_app/blr.csv")
+        self.grid_df = pd.read_csv("blr.csv")
     
     def foliumMap(self):
         features = []
@@ -145,18 +147,41 @@ class Visualiser:
         # Create a base map centered around the city
         lat_min, lat_max = 12.85, 13.20
         lon_min, lon_max = 77.45, 77.80
-        m = folium.Map(location=[(lat_min + lat_max) / 2, (lon_min + lon_max) / 2], zoom_start=12)
+    
+        min_zoom, max_zoom = 1, 13
+
+        # Create a base map centered around the city
+        m = folium.Map(location=[(lat_min + lat_max) / 2, (lon_min + lon_max) / 2], zoom_start=12, min_zoom=min_zoom, max_zoom=max_zoom)
 
         # Convert predictions to a list of [latitude, longitude, NO2] for HeatMap
         heat_data = [[row['latitude'], row['longitude'], row['NO2_prediction']] for index, row in self.grid_df.iterrows()]
 
-        # Add the heatmap layer
-        HeatMap(heat_data, radius=10).add_to(m)
+        # Add the heatmap layer with NO2 predictions
+        HeatMap(heat_data, radius=20, blur=25, max_zoom=12, min_opacity=0.4).add_to(m)
 
-        # Save the map as an HTML string to be displayed in Streamlit
+        # HTML for the custom legend
+        legend_html = '''
+        <div style="
+            position: fixed;
+            bottom: 50px; left: 50px; width: 150px; height: 150px;
+            background-color: white; border:2px solid grey; z-index:9999; font-size:14px;
+            padding: 0px;
+            ">
+            <b>NO2 Levels</b><br>
+            <i style="background: rgba(0, 0, 255, 0.5);width: 20px;height: 10px;display: inline-block;"></i> Low (<10 μg/m³)<br>
+            <i style="background: rgba(0, 255, 0, 0.5);width: 20px;height: 10px;display: inline-block;"></i> Moderate (10-20 μg/m³)<br>
+            <i style="background: rgba(255, 255, 0, 0.5);width: 20px;height: 10px;display: inline-block;"></i> High (20-40 μg/m³)<br>
+            <i style="background: rgba(255, 0, 0, 0.5);width: 20px;height: 10px;display: inline-block;"></i> Very High (>40 μg/m³)
+        </div>
+        '''
+
+        # Add the custom legend to the map
+        m.get_root().html.add_child(folium.Element(legend_html))
+
+        # Save the map to an HTML file or display directly
+        m.save('no2_heatmap_with_legend.html')
         map_html = m._repr_html_()
         return map_html
-
 
 
 class App:
@@ -225,7 +250,7 @@ class App:
                 map_html = st.session_state["viz_col1"].foliumMap()
 
                 # Display the map in Streamlit using st.components.v1.html()
-                st.components.v1.html(map_html, height=600)
+                st.components.v1.html(map_html, height=800)
 
         # Column 2
         with col2:
