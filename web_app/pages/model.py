@@ -1,3 +1,4 @@
+import json
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -11,7 +12,7 @@ from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
 import folium
 from folium.plugins import HeatMap
 import streamlit.components.v1 as components
-
+import plotly.express as px
 
 
 class ModelTrainer:
@@ -177,12 +178,123 @@ class Visualiser:
 
         # Add the custom legend to the map
         m.get_root().html.add_child(folium.Element(legend_html))
+        
+        # Embed NO₂ data in JavaScript format
+        no2_data_js = json.dumps(heat_data)
+        
+        # JavaScript function for adding marker and displaying NO2 value on click
+        # click_js = f"""
+        # <script>
+        #     function addMarker(e) {{
+        #         if (typeof marker !== 'undefined') {{
+        #             map.removeLayer(marker);
+        #         }}
+        #         let lat = e.latlng.lat;
+        #         let lon = e.latlng.lng;
+        #         let no2Value = 'No data';
+        #         let minDist = Infinity;
+        #         let data = {json.dumps(heat_data)};
+        #         data.forEach(point => {{
+        #             let distance = Math.sqrt((lat - point[0]) ** 2 + (lon - point[1]) ** 2);
+        #             if (distance < minDist) {{
+        #                 minDist = distance;
+        #                 no2Value = point[2];
+        #             }}
+        #         }});
+        #         marker = L.marker([lat, lon]).addTo(map);
+        #         marker.bindPopup("NO₂ concentration: " + no2Value.toFixed(3) + " μg/m³").openPopup();
+        #     }}
+        #     document.addEventListener("DOMContentLoaded", function() {{
+        #        window.map.on('click', onMapClick);
+        #     }});
+        # </script>
+        # """
+        
+        click_js = f"""
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {{
+                var map = this._leaflet_map;
+                map.on('click', function(e) {{
+                    let lat = e.latlng.lat;
+                    let lon = e.latlng.lng;
+                    let no2Value = 'No data';
+                    let minDist = Infinity;
+                    let data = {no2_data_js};
 
-        # Save the map to an HTML file or display directly
-        m.save('no2_heatmap_with_legend.html')
+                    data.forEach(point => {{
+                        let distance = Math.sqrt((lat - point[0]) ** 2 + (lon - point[1]) ** 2);
+                        if (distance < minDist) {{
+                            minDist = distance;
+                            no2Value = point[2];
+                        }}
+                    }});
+
+                    // Add marker and popup with NO2 value
+                    let marker = L.marker([lat, lon]).addTo(map);
+                    marker.bindPopup("NO₂ concentration: " + no2Value.toFixed(3) + " μg/m³").openPopup();
+                }});
+            }});
+        </script>
+        """
+
+        # Replace placeholder with the actual NO2 data
+        #click_js = click_js.replace("{{ data }}", str(heat_data))
+
+        # Attach the JavaScript function to the map
+        m.get_root().html.add_child(folium.Element(click_js))
+
         map_html = m._repr_html_()
         return map_html
+    
+    def plotlyMap(self):
+        
+        features = []
+        for key in self.driving_factors:
+            if self.driving_factors[key]:
+                features.append(key)
 
+        # Prepare data for Plotly
+        self.grid_df['NO2_prediction'] = self.model.predict(self.grid_df[features])
+
+        # Define map boundaries
+        lat_min, lat_max = 12.85, 13.20
+        lon_min, lon_max = 77.45, 77.80
+
+        # Convert predictions to a DataFrame for Plotly
+        # heat_data = pd.DataFrame({
+        #     'latitude': self.grid_df['latitude'],
+        #     'longitude': self.grid_df['longitude'],
+        #     'NO2_prediction': self.grid_df['NO2_prediction']
+        # })
+        
+        heat_data = self.grid_df
+
+        # Create a scatter mapbox plot with a color scale for NO2 predictions
+        fig = px.scatter_mapbox(heat_data, lat='latitude', lon='longitude',
+                                color='NO2_prediction',
+                                color_continuous_scale='Viridis',
+                                mapbox_style='open-street-map',
+                                size_max=5,  # Smaller point size for denser effect
+                                zoom=11,  # Adjust initial zoom level
+                            )
+
+        fig.update_layout(
+            mapbox=dict(
+                center={"lat": (lat_min + lat_max) / 2, "lon": (lon_min + lon_max) / 2},
+                zoom=9,  # Default zoom
+                style="open-street-map",# Limit the display to a fixed geographical range to restrict effective zoom
+                # domain=dict(
+                #     x=[0, 1],  # Full width
+                #     y=[0, 1]   # Full height
+                # ),
+                layers=[]
+            ),
+            height=500, 
+            width=1000
+        )
+        # Display the map
+        return fig
+        
 
 class App:
     def __init__(self):
@@ -247,10 +359,12 @@ class App:
                 st.write("Root Mean Squared Error (RMSE):", st.session_state["metrics_col1"]["RMSE"])
 
             if st.session_state["viz_col1"]:
-                map_html = st.session_state["viz_col1"].foliumMap()
+                map_html_1 = st.session_state["viz_col1"].foliumMap()
+                map_html_2 = st.session_state["viz_col1"].plotlyMap()
 
                 # Display the map in Streamlit using st.components.v1.html()
-                st.components.v1.html(map_html, height=800)
+                st.components.v1.html(map_html_1, height=800)
+                st.plotly_chart(map_html_2)
 
         # Column 2
         with col2:
