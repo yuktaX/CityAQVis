@@ -363,7 +363,7 @@ class App:
                 map_html_2 = st.session_state["viz_col1"].plotlyMap()
 
                 # Display the map in Streamlit using st.components.v1.html()
-                st.components.v1.html(map_html_1, height=800)
+                st.components.v1.html(map_html_1, height=300)
                 st.plotly_chart(map_html_2)
 
         # Column 2
@@ -411,10 +411,12 @@ class App:
                 st.write("Root Mean Squared Error (RMSE):", st.session_state["metrics_col2"]["RMSE"])
             
             if st.session_state["viz_col2"]:
-                map_html = st.session_state["viz_col2"].foliumMap()
+                map_html_1 = st.session_state["viz_col1"].foliumMap()
+                map_html_2 = st.session_state["viz_col1"].plotlyMap()
 
                 # Display the map in Streamlit using st.components.v1.html()
-                st.components.v1.html(map_html, height=600)
+                st.components.v1.html(map_html_1, height=300)
+                st.plotly_chart(map_html_2)
 
 if __name__ == "__main__":
     app = App()
