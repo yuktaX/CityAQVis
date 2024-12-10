@@ -1,5 +1,4 @@
-# Project_Elective_Sem6
-Bangalore Air Pollution Susceptibility Maps
+# CityAQVis: Machine Learning Sandbox With Comparative Visual Analytics For Air Quality In Urban Regions Using Multi-Source Data Bangalore Air Pollution Susceptibility Maps
 
 ## Part 1: Setting up the Dataset, Colab Notebook and training the ML model
 
