@@ -56,34 +56,6 @@ class Visualiser:
         # Embed NO₂ data in JavaScript format
         no2_data_js = json.dumps(heat_data)
         
-        # JavaScript function for adding marker and displaying NO2 value on click
-        # click_js = f"""
-        # <script>
-        #     function addMarker(e) {{
-        #         if (typeof marker !== 'undefined') {{
-        #             map.removeLayer(marker);
-        #         }}
-        #         let lat = e.latlng.lat;
-        #         let lon = e.latlng.lng;
-        #         let no2Value = 'No data';
-        #         let minDist = Infinity;
-        #         let data = {json.dumps(heat_data)};
-        #         data.forEach(point => {{
-        #             let distance = Math.sqrt((lat - point[0]) ** 2 + (lon - point[1]) ** 2);
-        #             if (distance < minDist) {{
-        #                 minDist = distance;
-        #                 no2Value = point[2];
-        #             }}
-        #         }});
-        #         marker = L.marker([lat, lon]).addTo(map);
-        #         marker.bindPopup("NO₂ concentration: " + no2Value.toFixed(3) + " μg/m³").openPopup();
-        #     }}
-        #     document.addEventListener("DOMContentLoaded", function() {{
-        #        window.map.on('click', onMapClick);
-        #     }});
-        # </script>
-        # """
-        
         click_js = f"""
         <script>
             document.addEventListener("DOMContentLoaded", function() {{
