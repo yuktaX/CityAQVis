@@ -3,6 +3,7 @@ import folium
 from folium.plugins import HeatMap
 import streamlit.components.v1 as components
 import plotly.express as px
+import matplotlib.pyplot as plt
 
 
 from classes.ModelTrainer import ModelTrainer
@@ -24,6 +25,14 @@ class App:
             st.session_state["viz_col1"] = None
         if "viz_col2" not in st.session_state:
             st.session_state["viz_col2"] = None
+        if "ypred_col1" not in st.session_state:
+            st.session_state["ypred_col1"] = None
+        if "ytest_col1" not in st.session_state:
+            st.session_state["ytest_col1"] = None
+        if "ytest_col2" not in st.session_state:
+            st.session_state["ytest_col2"] = None
+        if "ypred_col2" not in st.session_state:
+            st.session_state["ypred_col2"] = None
 
         col1, col2 = st.columns(2)
 
@@ -68,10 +77,12 @@ class App:
                 
                 # Initialize the trainer and train the model
                 trainer = ModelTrainer(selected_model, driving_factors, selected_city, year_of_study)
-                model, metrics = trainer.train_model()
+                model, metrics, y_pred, y_test = trainer.train_model()
                 
                 # Store results in session state
                 st.session_state["metrics_col1"] = metrics
+                st.session_state["ypred_col1"] = y_pred
+                st.session_state["ytest_col1"] = y_test
                 viz = Visualiser(model, driving_factors)
                 st.session_state["viz_col1"] = viz
 
@@ -87,6 +98,15 @@ class App:
             if st.session_state["viz_col1"]:
                 map_html_1 = st.session_state["viz_col1"].foliumMap()
                 map_html_2 = st.session_state["viz_col1"].plotlyMap()
+
+                fig, ax = plt.subplots(figsize=(8, 6))
+                ax.scatter(st.session_state["ytest_col1"], st.session_state["ypred_col1"], color='blue', label='Predicted vs Actual')
+                ax.plot([st.session_state["ytest_col1"].min(), st.session_state["ytest_col1"].max()], [st.session_state["ytest_col1"].min(), st.session_state["ytest_col1"].max()], 'r--', lw=2, label='Ideal Fit')
+                ax.set_title("Actual vs Predicted")
+                ax.set_xlabel("Actual Values")
+                ax.set_ylabel("Predicted Values")
+                ax.legend()
+                st.pyplot(fig)
 
                 # Display the map in Streamlit using st.components.v1.html()
                 st.components.v1.html(map_html_1, height=300)
@@ -131,10 +151,12 @@ class App:
                 }
                 
                 trainer = ModelTrainer(selected_model, driving_factors, selected_city, year_of_study)
-                model, metrics = trainer.train_model()
+                model, metrics, y_pred, y_test = trainer.train_model()
 
                 # Store results in session state
                 st.session_state["metrics_col2"] = metrics
+                st.session_state["ypred_col2"] = y_pred
+                st.session_state["ytest_col2"] = y_test
                 viz = Visualiser(model, driving_factors)
                 st.session_state["viz_col2"] = viz
 
@@ -150,6 +172,15 @@ class App:
             if st.session_state["viz_col2"]:
                 map_html_1 = st.session_state["viz_col2"].foliumMap()
                 map_html_2 = st.session_state["viz_col2"].plotlyMap()
+
+                fig, ax = plt.subplots(figsize=(8, 6))
+                ax.scatter(st.session_state["ytest_col2"], st.session_state["ypred_col2"], color='blue', label='Predicted vs Actual')
+                ax.plot([st.session_state["ytest_col2"].min(), st.session_state["ytest_col2"].max()], [st.session_state["ytest_col2"].min(), st.session_state["ytest_col2"].max()], 'r--', lw=2, label='Ideal Fit')
+                ax.set_title("Actual vs Predicted")
+                ax.set_xlabel("Actual Values")
+                ax.set_ylabel("Predicted Values")
+                ax.legend()
+                st.pyplot(fig)
 
                 # Display the map in Streamlit using st.components.v1.html()
                 st.components.v1.html(map_html_1, height=300)

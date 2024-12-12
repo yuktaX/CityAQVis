@@ -66,7 +66,7 @@ class ModelTrainer:
             raise ValueError("Unsupported model selected")
 
         metrics = self.evaluate_model(y_test, y_pred)
-        return model, metrics
+        return model, metrics, y_pred, y_test
 
     def gradient_boosting(self, x_train, y_train, x_test):
         np.random.seed(55)
