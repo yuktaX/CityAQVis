@@ -83,7 +83,7 @@ class App:
                 st.session_state["metrics_col1"] = metrics
                 st.session_state["ypred_col1"] = y_pred
                 st.session_state["ytest_col1"] = y_test
-                viz = Visualiser(model, driving_factors)
+                viz = Visualiser(model, driving_factors, selected_city)
                 st.session_state["viz_col1"] = viz
 
             # Display results of model 1 if available
@@ -157,7 +157,7 @@ class App:
                 st.session_state["metrics_col2"] = metrics
                 st.session_state["ypred_col2"] = y_pred
                 st.session_state["ytest_col2"] = y_test
-                viz = Visualiser(model, driving_factors)
+                viz = Visualiser(model, driving_factors, selected_city)
                 st.session_state["viz_col2"] = viz
 
             # Display results of model 2 if available

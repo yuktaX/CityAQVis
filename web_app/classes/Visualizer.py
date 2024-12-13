@@ -6,10 +6,25 @@ import plotly.express as px
 
 
 class Visualiser:
-    def __init__(self, model, driving_factors) -> None:
+    def __init__(self, model, driving_factors, city) -> None:
         self.model = model
         self.driving_factors = driving_factors
-        self.grid_df = pd.read_csv("blr.csv")
+        self.city = city
+        
+        #input of ground locations points along 
+        #with yearly composite of driving factors
+        #we will use this as input to predict from our trained model and visualize it
+        
+        if city == "Bangalore":
+            self.grid_df = pd.read_csv("blr.csv")
+            self.lat_min, self.lat_max = 12.85, 13.20
+            self.lon_min, self.lon_max = 77.45, 77.80
+        else:
+            self.grid_df = pd.read_csv("del.csv")
+            self.lat_min, self.lat_max = 28.40, 28.90
+            self.lon_min, self.lon_max = 76.80, 77.30
+
+            
     
     def foliumMap(self):
         features = []
@@ -20,13 +35,13 @@ class Visualiser:
         self.grid_df['NO2_prediction'] = self.model.predict(self.grid_df[features])
 
         # Create a base map centered around the city
-        lat_min, lat_max = 12.85, 13.20
-        lon_min, lon_max = 77.45, 77.80
+        # lat_min, lat_max = 12.85, 13.20
+        # lon_min, lon_max = 77.45, 77.80
     
         min_zoom, max_zoom = 1, 13
 
         # Create a base map centered around the city
-        m = folium.Map(location=[(lat_min + lat_max) / 2, (lon_min + lon_max) / 2], zoom_start=12, min_zoom=min_zoom, max_zoom=max_zoom)
+        m = folium.Map(location=[(self.lat_min + self.lat_max) / 2, (self.lon_min + self.lon_max) / 2], zoom_start=12, min_zoom=min_zoom, max_zoom=max_zoom)
 
         # Convert predictions to a list of [latitude, longitude, NO2] for HeatMap
         heat_data = [[row['latitude'], row['longitude'], row['NO2_prediction']] for index, row in self.grid_df.iterrows()]
@@ -103,15 +118,8 @@ class Visualiser:
         self.grid_df['NO2_prediction'] = self.model.predict(self.grid_df[features])
 
         # Define map boundaries
-        lat_min, lat_max = 12.85, 13.20
-        lon_min, lon_max = 77.45, 77.80
-
-        # Convert predictions to a DataFrame for Plotly
-        # heat_data = pd.DataFrame({
-        #     'latitude': self.grid_df['latitude'],
-        #     'longitude': self.grid_df['longitude'],
-        #     'NO2_prediction': self.grid_df['NO2_prediction']
-        # })
+        # lat_min, lat_max = 12.85, 13.20
+        # lon_min, lon_max = 77.45, 77.80
         
         heat_data = self.grid_df
 
@@ -126,13 +134,9 @@ class Visualiser:
 
         fig.update_layout(
             mapbox=dict(
-                center={"lat": (lat_min + lat_max) / 2, "lon": (lon_min + lon_max) / 2},
+                center={"lat": (self.lat_min + self.lat_max) / 2, "lon": (self.lon_min + self.lon_max) / 2},
                 zoom=9,  # Default zoom
                 style="open-street-map",# Limit the display to a fixed geographical range to restrict effective zoom
-                # domain=dict(
-                #     x=[0, 1],  # Full width
-                #     y=[0, 1]   # Full height
-                # ),
                 layers=[]
             ),
             height=500, 

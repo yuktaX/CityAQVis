@@ -140,6 +140,8 @@ st.markdown(
        - If you want to directly upload data to the web app:  
          - Place the data in the `web_app/Data` folder.  
          - Update the paths accordingly in `web_app/classes/ModelTrainer.py`.
+    10. **Visualize predictions**  
+       - You need a sample input  
 
     ---
     """
