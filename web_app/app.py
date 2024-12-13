@@ -141,7 +141,11 @@ st.markdown(
          - Place the data in the `web_app/Data` folder.  
          - Update the paths accordingly in `web_app/classes/ModelTrainer.py`.
     10. **Visualize predictions**  
-       - You need a sample input  
+       - For visualising the model predictions over any particular area, you need a shapefile of that area first.
+       - Extract the driving factor data (in TIFF format) for the stations using your shapefile in **Google Earth Engine**.
+       - Create a uniform grid of points over your city, each point is defined by its latitude and longitude. We will predict the pollutant levels at each point.
+       - Extract the driving factor data for each point using the TIFF files and store the information in a csv file, "your_city.csv".
+       - use "your_city.csv" in place of **blr.csv** and **delhi.csv**
 
     ---
     """
