@@ -15,6 +15,7 @@ We have used streamlit to build this application.
 
    
 ![webapp-1](https://github.com/user-attachments/assets/a6fed05e-85f7-416e-910f-b0dcf55cb958)
+![webapp-2](https://github.com/user-attachments/assets/cbc13f53-98a4-43b2-8e99-d4f5f6081fb6)
 
 ![app-1](https://github.com/user-attachments/assets/cdd16873-55e7-4c82-b251-f66c81d5274e)
 ![app-2](https://github.com/user-attachments/assets/e749883d-a249-47cb-b02c-ab7b0c8c6317)
