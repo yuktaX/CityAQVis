@@ -20,7 +20,7 @@ class Visualiser:
             self.lat_min, self.lat_max = 12.85, 13.20
             self.lon_min, self.lon_max = 77.45, 77.80
         else:
-            self.grid_df = pd.read_csv("del.csv")
+            self.grid_df = pd.read_csv("delhi.csv")
             self.lat_min, self.lat_max = 28.40, 28.90
             self.lon_min, self.lon_max = 76.80, 77.30
 
