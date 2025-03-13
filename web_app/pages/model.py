@@ -62,6 +62,9 @@ class App:
                 default=[],
                 key="driving_factors_col1"
             )
+            
+            # Toggle button for color scale selection
+            use_global_scale = st.toggle("Use Global Color Scale for Plotly map", value=False, key = "toggle_1")
 
             if st.button("Train model", key="train_model_col1"):
                 # Map selected factors to driving factor keys
@@ -97,7 +100,7 @@ class App:
 
             if st.session_state["viz_col1"]:
                 map_html_1 = st.session_state["viz_col1"].foliumMap()
-                map_html_2 = st.session_state["viz_col1"].plotlyMap()
+                map_html_2 = st.session_state["viz_col1"].plotlyMap(use_global_scale)
 
                 fig, ax = plt.subplots(figsize=(8, 6))
                 ax.scatter(st.session_state["ytest_col1"], st.session_state["ypred_col1"], color='blue', label='Predicted vs Actual')
@@ -137,6 +140,9 @@ class App:
                 default=[],
                 key="driving_factors_col2"
             )
+            
+            # Toggle button for color scale selection
+            use_global_scale_2 = st.toggle("Use Global Color Scale for Plotly map", value=False, key = "toggle_2")
 
             if st.button("Train model", key="train_model_col2"):
                 # Map selected factors to driving factor keys
@@ -171,7 +177,7 @@ class App:
             
             if st.session_state["viz_col2"]:
                 map_html_1 = st.session_state["viz_col2"].foliumMap()
-                map_html_2 = st.session_state["viz_col2"].plotlyMap()
+                map_html_2 = st.session_state["viz_col2"].plotlyMap(use_global_scale_2)
 
                 fig, ax = plt.subplots(figsize=(8, 6))
                 ax.scatter(st.session_state["ytest_col2"], st.session_state["ypred_col2"], color='blue', label='Predicted vs Actual')

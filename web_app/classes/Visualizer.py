@@ -1,9 +1,8 @@
-import json
 import pandas as pd
 import folium
 from folium.plugins import HeatMap
 import plotly.express as px
-
+import plotly.graph_objects as go
 
 class Visualiser:
     def __init__(self, model, driving_factors, city) -> None:
@@ -53,94 +52,63 @@ class Visualiser:
         legend_html = '''
         <div style="
             position: fixed;
-            bottom: 50px; left: 50px; width: 150px; height: 150px;
+            bottom: 20px; left: 20px; width: 140px; height: 110px;
             background-color: white; border:2px solid grey; z-index:9999; font-size:14px;
             padding: 0px;
             ">
-            <b>NO2 Levels</b><br>
-            <i style="background: rgba(0, 0, 255, 0.5);width: 20px;height: 10px;display: inline-block;"></i> Low (<10 μg/m³)<br>
-            <i style="background: rgba(0, 255, 0, 0.5);width: 20px;height: 10px;display: inline-block;"></i> Moderate (10-20 μg/m³)<br>
-            <i style="background: rgba(255, 255, 0, 0.5);width: 20px;height: 10px;display: inline-block;"></i> High (20-40 μg/m³)<br>
-            <i style="background: rgba(255, 0, 0, 0.5);width: 20px;height: 10px;display: inline-block;"></i> Very High (>40 μg/m³)
+            <b>NO₂ (µg/m³)</b><br>
+            <i style="background: rgba(0, 0, 255, 0.5);width: 20px;height: 10px;display: inline-block;"></i> Low (<10)<br>
+            <i style="background: rgba(0, 255, 0, 0.5);width: 20px;height: 10px;display: inline-block;"></i> Moderate (10-20)<br>
+            <i style="background: rgba(255, 255, 0, 0.5);width: 20px;height: 10px;display: inline-block;"></i> High (20-40)<br>
+            <i style="background: rgba(255, 0, 0, 0.5);width: 20px;height: 10px;display: inline-block;"></i> Very High (>40)
         </div>
         '''
 
         # Add the custom legend to the map
         m.get_root().html.add_child(folium.Element(legend_html))
-        
-        # Embed NO₂ data in JavaScript format
-        no2_data_js = json.dumps(heat_data)
-        
-        click_js = f"""
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {{
-                var map = this._leaflet_map;
-                map.on('click', function(e) {{
-                    let lat = e.latlng.lat;
-                    let lon = e.latlng.lng;
-                    let no2Value = 'No data';
-                    let minDist = Infinity;
-                    let data = {no2_data_js};
-
-                    data.forEach(point => {{
-                        let distance = Math.sqrt((lat - point[0]) ** 2 + (lon - point[1]) ** 2);
-                        if (distance < minDist) {{
-                            minDist = distance;
-                            no2Value = point[2];
-                        }}
-                    }});
-
-                    // Add marker and popup with NO2 value
-                    let marker = L.marker([lat, lon]).addTo(map);
-                    marker.bindPopup("NO₂ concentration: " + no2Value.toFixed(3) + " μg/m³").openPopup();
-                }});
-            }});
-        </script>
-        """
-
-        # Replace placeholder with the actual NO2 data
-        #click_js = click_js.replace("{{ data }}", str(heat_data))
-
-        # Attach the JavaScript function to the map
-        m.get_root().html.add_child(folium.Element(click_js))
-
+    
         map_html = m._repr_html_()
         return map_html
-    
-    def plotlyMap(self):
-        
-        features = []
-        for key in self.driving_factors:
-            if self.driving_factors[key]:
-                features.append(key)
+
+    def plotlyMap(self, global_scale = False):
+        features = [key for key in self.driving_factors if self.driving_factors[key]]
 
         # Prepare data for Plotly
         self.grid_df['NO2_prediction'] = self.model.predict(self.grid_df[features])
 
-        # Define map boundaries
-        # lat_min, lat_max = 12.85, 13.20
-        # lon_min, lon_max = 77.45, 77.80
-        
         heat_data = self.grid_df
 
-        # Create a scatter mapbox plot with a color scale for NO2 predictions
-        fig = px.scatter_mapbox(heat_data, lat='latitude', lon='longitude',
-                                color='NO2_prediction',
-                                color_continuous_scale='Viridis',
-                                mapbox_style='open-street-map',
-                                size_max=5,  # Smaller point size for denser effect
-                                zoom=11,  # Adjust initial zoom level
-                            )
+        # Define global color scale range (fixed for consistency)
+        color_min, color_max = (0, 50) if global_scale else (heat_data["NO2_prediction"].min(), heat_data["NO2_prediction"].max())
+
+        # Create a scatter mapbox plot with a fixed color scale for NO2 predictions
+        fig = px.scatter_mapbox(
+            heat_data, lat='latitude', lon='longitude',
+            color='NO2_prediction',
+            color_continuous_scale='Viridis',
+            range_color=[color_min, color_max],  # FIXED color range for consistency
+            mapbox_style='open-street-map',
+            size_max=5,
+            zoom=11,
+        )
 
         fig.update_layout(
             mapbox=dict(
                 center={"lat": (self.lat_min + self.lat_max) / 2, "lon": (self.lon_min + self.lon_max) / 2},
-                zoom=9,  # Default zoom
-                style="open-street-map",# Limit the display to a fixed geographical range to restrict effective zoom
+                zoom=9,
+                style="open-street-map",
                 layers=[]
             ),
-            height=500, 
-            width=1000
+            height=600,
+            width=1000,
+            coloraxis_colorbar=dict(
+                title="NO₂ (µg/m³)",
+                tickvals=[0, 10, 20, 40, 50] if global_scale else None,  # Ensure tick values align with legend
+                ticktext=["Low (<10)", "Moderate (10-20)", "High (20-40)", "Very High (>40)"] if global_scale else None,
+            ),
         )
-        # Display the map
+        
+        fig.update_layout()
+
         return fig
+
