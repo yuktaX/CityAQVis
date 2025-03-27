@@ -8,7 +8,7 @@ This repository contains the code and data for CityAQVis, a machine learning-bas
 - **`.venv/`** – Virtual environment directory containing dependencies (not required for deployment).  
 - **`Data/`** – Contains data files required for model training and visualization.  
 - **`classes/`** – Houses Python scripts for different components, such as model training, and visualization.  
-- **`pages/`** – Streamlit multi-page support, containing different views of the application.  
+- **`pages/`** – Streamlit multi-page support, this conatains the model building and visualization interactive page 
 - **`app.py`** – The main entry point for running the Streamlit application, this contains the landing page of the application and has instructions on how to use it.
 - **`blr.csv`** – Inference dataset containing yearly composite driving factors for Bangalore 2019.  
 - **`delhi.csv`** – Inference dataset containing yearly composite driving factors for Delhi 2019. 
@@ -25,4 +25,7 @@ This repository contains the code and data for CityAQVis, a machine learning-bas
 ## Getting Started
 Once the application is up and running, you will see the landing page with more instructions and guidelines on how to use it
 ![webapp-1](https://github.com/user-attachments/assets/a6fed05e-85f7-416e-910f-b0dcf55cb958)
+![app-1](https://github.com/user-attachments/assets/cdd16873-55e7-4c82-b251-f66c81d5274e)
+![app-2](https://github.com/user-attachments/assets/e749883d-a249-47cb-b02c-ab7b0c8c6317)
+![app-3](https://github.com/user-attachments/assets/79c5c2e9-63ca-42d8-a71b-daffde803595)
 
