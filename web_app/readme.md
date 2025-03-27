@@ -10,8 +10,8 @@ This repository contains the code and data for CityAQVis, a machine learning-bas
 - **`classes/`** – Houses Python scripts for different components, such as model training, and visualization.  
 - **`pages/`** – Streamlit multi-page support, containing different views of the application.  
 - **`app.py`** – The main entry point for running the Streamlit application, this contains the landing page of the application and has instructions on how to use it.
-- **`blr.csv`** – Dataset containing air quality data for Bangalore 2019.  
-- **`delhi.csv`** – Dataset containing air quality data for Delhi 2019.  
+- **`blr.csv`** – Inference dataset containing yearly composite driving factors for Bangalore 2019.  
+- **`delhi.csv`** – Inference dataset containing yearly composite driving factors for Delhi 2019. 
 - **`requirements.txt`** – List of dependencies required to run the project. 
 
 ## Setup
