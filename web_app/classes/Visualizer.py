@@ -5,7 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 class Visualiser:
-    def __init__(self, model, driving_factors, city) -> None:
+    def __init__(self, model, driving_factors, city, year) -> None:
         self.model = model
         self.driving_factors = driving_factors
         self.city = city
@@ -15,11 +15,14 @@ class Visualiser:
         #we will use this as input to predict from our trained model and visualize it
         
         if city == "Bangalore":
-            self.grid_df = pd.read_csv("blr.csv")
+            if year == "2019":
+                self.grid_df = pd.read_csv("Data/blr_2019_inference.csv")
+            else:
+                self.grid_df = pd.read_csv("Data/blr_2022_inference.csv")
             self.lat_min, self.lat_max = 12.85, 13.20
             self.lon_min, self.lon_max = 77.45, 77.80
         else:
-            self.grid_df = pd.read_csv("delhi.csv")
+            self.grid_df = pd.read_csv("Data/delhi_2019_inference.csv")
             self.lat_min, self.lat_max = 28.40, 28.90
             self.lon_min, self.lon_max = 76.80, 77.30
 

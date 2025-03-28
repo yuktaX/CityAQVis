@@ -48,11 +48,11 @@ class App:
             selected_pollutant = st.selectbox("Pollutant:", pollutants, key="pollutant_col1")
             
             if selected_city == "Delhi":
-                year_of_study = ["2019"]
-                selected_year = st.selectbox("Year Of Study: ", year_of_study, key="year_col1")
+                years = ["2019"]
+                selected_year = st.selectbox("Year Of Study: ", years, key="year_col1")
             else:
-                year_of_study = ["2019", "2022"]
-                selected_year = st.selectbox("Year Of Study: ", year_of_study, key="year_col1")
+                years = ["2019", "2022"]
+                selected_year = st.selectbox("Year Of Study: ", years, key="year_col1")
 
             # Streamlit Multiselect Dropdown
            
@@ -79,14 +79,14 @@ class App:
                 }
                 
                 # Initialize the trainer and train the model
-                trainer = ModelTrainer(selected_model, driving_factors, selected_city, year_of_study)
+                trainer = ModelTrainer(selected_model, driving_factors, selected_city, selected_year)
                 model, metrics, y_pred, y_test = trainer.train_model()
                 
                 # Store results in session state
                 st.session_state["metrics_col1"] = metrics
                 st.session_state["ypred_col1"] = y_pred
                 st.session_state["ytest_col1"] = y_test
-                viz = Visualiser(model, driving_factors, selected_city)
+                viz = Visualiser(model, driving_factors, selected_city, selected_year)
                 st.session_state["viz_col1"] = viz
 
             # Display results of model 1 if available
@@ -118,20 +118,20 @@ class App:
         # Column 2
         with col2:
             city = ["Bangalore", "Delhi"]
-            selected_city = st.selectbox("City:", city, key="city_col2")
+            selected_city_2 = st.selectbox("City:", city, key="city_col2")
             
             models = ["Linear regression", "SVM", "Random Forest", "GBR"]
-            selected_model = st.selectbox("Model:", models, key="model_col2")
+            selected_model_2 = st.selectbox("Model:", models, key="model_col2")
 
             pollutants = ["NO2"]
             selected_pollutant = st.selectbox("Pollutant:", pollutants, key="pollutant_col2")
             
-            if selected_city == "Delhi":
-                year_of_study = ["2019"]
-                selected_year = st.selectbox("Year Of Study: ", year_of_study, key="year_col2")
+            if selected_city_2 == "Delhi":
+                years = ["2019"]
+                selected_year = st.selectbox("Year Of Study: ", years, key="year_col2")
             else:
-                year_of_study = ["2019", "2022"]
-                selected_year = st.selectbox("Year Of Study: ", year_of_study, key="year_col2")
+                years = ["2019", "2022"]
+                selected_year = st.selectbox("Year Of Study: ", years, key="year_col2")
 
 
             selected_factors = st.multiselect(
@@ -156,14 +156,14 @@ class App:
                     "WindSpeed": "WindSpeed" in selected_factors,
                 }
                 
-                trainer = ModelTrainer(selected_model, driving_factors, selected_city, year_of_study)
+                trainer = ModelTrainer(selected_model_2, driving_factors, selected_city_2, selected_year)
                 model, metrics, y_pred, y_test = trainer.train_model()
 
                 # Store results in session state
                 st.session_state["metrics_col2"] = metrics
                 st.session_state["ypred_col2"] = y_pred
                 st.session_state["ytest_col2"] = y_test
-                viz = Visualiser(model, driving_factors, selected_city)
+                viz = Visualiser(model, driving_factors, selected_city_2, selected_year)
                 st.session_state["viz_col2"] = viz
 
             # Display results of model 2 if available

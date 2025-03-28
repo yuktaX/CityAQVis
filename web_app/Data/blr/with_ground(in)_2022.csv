@@ -1,4 +1,4 @@
-geometry,NAME,NO2,Elevation,Rainfall,Population,VIIRS,Temperature,WindSpeed,Monthly_avg_ground_data (micro g/m^3),Month
+geometry,NAME,NO2 (mol/m^2),Elevation,Rainfall,Population,VIIRS,Temperature,WindSpeed,Monthly_avg_ground_data (micro g/m^3),Month
 POINT (784605 1429452),Silk Board,8.27E-05,899,2,311.08472,40.075623,299,160,40.77,Jan
 POINT (784605 1429452),Silk Board,0.000101975,899,2,311.08472,54.375,314,170,43.76,Feb
 POINT (784605 1429452),Silk Board,0.000104266,899,0,311.08472,53.89875,341,190,32.35,March

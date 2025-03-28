@@ -21,13 +21,14 @@ class ModelTrainer:
 
     def load_data(self):
         city_mapping = {"Bangalore":"blr", "Delhi":"del"}
-        
+        print(self.model_name, self.city, self.year)
         df = pd.read_csv(
-            "Data/" + city_mapping[self.city] + "/with_ground(in)_" + self.year[0] + ".csv", 
+            "Data/" + city_mapping[self.city] + "/with_ground(in)_" + self.year + ".csv", 
             encoding='unicode_escape'
         )
         
         df = df.dropna()
+        print("Data/" + city_mapping[self.city] + "/with_ground(in)_" + self.year + ".csv")
         return df
 
     def preprocess_data(self):
