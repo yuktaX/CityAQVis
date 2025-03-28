@@ -10,4 +10,4 @@
 We have used streamlit to build this application. We developed an interactive sandbox environment that enables users to train,
 compare, and visualize NO2 predictions across urban areas. This tool allows for flexible experimentation with different machine learning models and datasets, making it adaptable to various cities and pollutants.
 
-Refer to `web_app/readme.md` for the detailed description and setup.
+Refer to [webapp readme](/webapp/readme.md) for the detailed description and setup.
