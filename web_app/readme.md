@@ -25,6 +25,7 @@ This repository contains the code and data for CityAQVis, a machine learning-bas
 ## Getting Started
 Once the application is up and running, you will see the landing page with more instructions and guidelines on how to use it
 ![webapp-1](https://github.com/user-attachments/assets/a6fed05e-85f7-416e-910f-b0dcf55cb958)
+![webapp-2](https://github.com/user-attachments/assets/8e4fbe3b-504b-4d36-a7bd-bb6abc67e035)
 ![app-1](https://github.com/user-attachments/assets/cdd16873-55e7-4c82-b251-f66c81d5274e)
 ![app-2](https://github.com/user-attachments/assets/e749883d-a249-47cb-b02c-ab7b0c8c6317)
 ![app-3](https://github.com/user-attachments/assets/79c5c2e9-63ca-42d8-a71b-daffde803595)
