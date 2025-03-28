@@ -6,7 +6,7 @@ This repository contains the code and data for CityAQVis, a machine learning-bas
 
 - **`.streamlit/`** – Streamlit configuration files for customizing the web application settings.  
 - **`.venv/`** – Virtual environment directory containing dependencies (not required for deployment).  
-- **`Data/`** – Contains data files required for model training and visualization.  
+- **`Data/`** – Contains data files required for model training and visualization for each city. The relative file paths here are important as it is used in the code 
 - **`classes/`** – Houses Python scripts for different components, such as model training, and visualization.  
 - **`pages/`** – Streamlit multi-page support, this conatains the model building and visualization interactive page 
 - **`app.py`** – The main entry point for running the Streamlit application, this contains the landing page of the application and has instructions on how to use it.
