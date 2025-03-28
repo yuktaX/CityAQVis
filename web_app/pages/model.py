@@ -44,7 +44,7 @@ class App:
             models = ["Linear regression", "SVM", "Random Forest", "GBR"]
             selected_model = st.selectbox("Model:", models, key="model_col1")
 
-            pollutants = ["NO2", "SO2", "CH4"]
+            pollutants = ["NO2"]
             selected_pollutant = st.selectbox("Pollutant:", pollutants, key="pollutant_col1")
             
             if selected_city == "Delhi":
@@ -123,7 +123,7 @@ class App:
             models = ["Linear regression", "SVM", "Random Forest", "GBR"]
             selected_model = st.selectbox("Model:", models, key="model_col2")
 
-            pollutants = ["NO2", "SO2", "CH4"]
+            pollutants = ["NO2"]
             selected_pollutant = st.selectbox("Pollutant:", pollutants, key="pollutant_col2")
             
             if selected_city == "Delhi":

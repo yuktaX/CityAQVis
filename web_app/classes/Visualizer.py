@@ -32,10 +32,6 @@ class Visualiser:
                 features.append(key)
 
         self.grid_df['NO2_prediction'] = self.model.predict(self.grid_df[features])
-
-        # Create a base map centered around the city
-        # lat_min, lat_max = 12.85, 13.20
-        # lon_min, lon_max = 77.45, 77.80
     
         min_zoom, max_zoom = 1, 13
 
