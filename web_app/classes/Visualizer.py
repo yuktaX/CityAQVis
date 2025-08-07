@@ -75,7 +75,6 @@ class Visualiser:
 
         # Add the custom legend to the map
         m.get_root().html.add_child(folium.Element(legend_html))
-    
         map_html = m._repr_html_()
         return map_html
 

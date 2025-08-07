@@ -112,7 +112,7 @@ class App:
                 st.pyplot(fig)
 
                 # Display the map in Streamlit using st.components.v1.html()
-                st.components.v1.html(map_html_1, height=400)
+                st.components.v1.html(map_html_1, height=400, width=900)
                 st.plotly_chart(map_html_2)
                 
         # Column 2
@@ -189,7 +189,7 @@ class App:
                 st.pyplot(fig)
 
                 # Display the map in Streamlit using st.components.v1.html()
-                st.components.v1.html(map_html_1, height=400)
+                st.components.v1.html(map_html_1, height=400, width=900)
                 st.plotly_chart(map_html_2)
 
             
