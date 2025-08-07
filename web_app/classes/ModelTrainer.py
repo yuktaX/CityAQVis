@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import pandas as pd
 import numpy as np
@@ -21,14 +22,20 @@ class ModelTrainer:
 
     def load_data(self):
         city_mapping = {"Bangalore":"blr", "Delhi":"del"}
-        print(self.model_name, self.city, self.year)
-        df = pd.read_csv(
-            "Data/" + city_mapping[self.city] + "/with_ground(in)_" + self.year + ".csv", 
-            encoding='unicode_escape'
+        
+        # Get project root directory regardless of where app.py is run from
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # goes up from /web_app/
+
+        # Construct the path relative to the project root
+        csv_path = os.path.join(
+            project_root, 
+            "Data", 
+            city_mapping[self.city], 
+            f"with_ground(in)_{self.year}.csv"
         )
         
+        df = pd.read_csv(csv_path, encoding='unicode_escape')
         df = df.dropna()
-        print("Data/" + city_mapping[self.city] + "/with_ground(in)_" + self.year + ".csv")
         return df
 
     def preprocess_data(self):
