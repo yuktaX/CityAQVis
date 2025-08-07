@@ -1,3 +1,9 @@
 streamlit>=1.35.0
 altair<5
 earthengine-api>=0.1.375
+geemap>=0.30.0
+folium>=0.14.0
+plotly>=5.15.0
+numpy
+pandas
+scikit-learn
