@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import folium
 from folium.plugins import HeatMap
@@ -10,22 +11,31 @@ class Visualiser:
         self.driving_factors = driving_factors
         self.city = city
         
-        #input of ground locations points along 
-        #with yearly composite of driving factors
-        #we will use this as input to predict from our trained model and visualize it
+        # Input of ground locations points along 
+        # with yearly composite of driving factors
+        # We will use this as input to predict from our trained model and visualize it
         
+        # Define root of the repo (1 level above web_app/)
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+        # Set file path based on city and year
         if city == "Bangalore":
             if year == "2019":
-                self.grid_df = pd.read_csv("Data/blr_2019_inference.csv")
+                filename = "blr_2019_inference.csv"
             else:
-                self.grid_df = pd.read_csv("Data/blr_2022_inference.csv")
+                filename = "blr_2022_inference.csv"
             self.lat_min, self.lat_max = 12.85, 13.20
             self.lon_min, self.lon_max = 77.45, 77.80
-        else:
-            self.grid_df = pd.read_csv("Data/delhi_2019_inference.csv")
+        else:  # Delhi
+            filename = "delhi_2019_inference.csv"
             self.lat_min, self.lat_max = 28.40, 28.90
             self.lon_min, self.lon_max = 76.80, 77.30
 
+        # Join the full path
+        file_path = os.path.join(project_root, "Data", filename)
+
+        # Read the CSV
+        self.grid_df = pd.read_csv(file_path)
             
     
     def foliumMap(self):
