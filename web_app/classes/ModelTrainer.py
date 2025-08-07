@@ -142,5 +142,5 @@ class ModelTrainer:
         mae = mean_absolute_error(y_test, y_pred)
         mse = mean_squared_error(y_test, y_pred)
         mape = self.mean_absolute_percentage_error(y_test, y_pred)
-        rmse = mean_squared_error(y_test, y_pred, root_mean_squared_error=True)
+        rmse = np.sqrt(mse)
         return {"R2": r2, "MAE": mae, "MSE": mse, "MAPE": mape, "RMSE": rmse}
