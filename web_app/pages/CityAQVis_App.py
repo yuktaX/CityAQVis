@@ -78,16 +78,21 @@ class App:
                     "WindSpeed": "WindSpeed" in selected_factors,
                 }
                 
-                # Initialize the trainer and train the model
-                trainer = ModelTrainer(selected_model, driving_factors, selected_city, selected_year)
-                model, metrics, y_pred, y_test = trainer.train_model()
-                
-                # Store results in session state
-                st.session_state["metrics_col1"] = metrics
-                st.session_state["ypred_col1"] = y_pred
-                st.session_state["ytest_col1"] = y_test
-                viz = Visualiser(model, driving_factors, selected_city, selected_year)
-                st.session_state["viz_col1"] = viz
+                try:
+                    # Initialize the trainer and train the model
+                    trainer = ModelTrainer(selected_model, driving_factors, selected_city, selected_year)
+                    model, metrics, y_pred, y_test = trainer.train_model()
+                    
+                    # Store results in session state
+                    st.session_state["metrics_col1"] = metrics
+                    st.session_state["ypred_col1"] = y_pred
+                    st.session_state["ytest_col1"] = y_test
+                    viz = Visualiser(model, driving_factors, selected_city, selected_year)
+                    st.session_state["viz_col1"] = viz
+                except ValueError as e:
+                    # Catch the specific error and display it to the user
+                    st.error(e)
+
 
             # Display results of model 1 if available
             if st.session_state["metrics_col1"]:
@@ -156,15 +161,19 @@ class App:
                     "WindSpeed": "WindSpeed" in selected_factors,
                 }
                 
-                trainer = ModelTrainer(selected_model_2, driving_factors, selected_city_2, selected_year)
-                model, metrics, y_pred, y_test = trainer.train_model()
+                try:
+                    trainer = ModelTrainer(selected_model_2, driving_factors, selected_city_2, selected_year)
+                    model, metrics, y_pred, y_test = trainer.train_model()
 
-                # Store results in session state
-                st.session_state["metrics_col2"] = metrics
-                st.session_state["ypred_col2"] = y_pred
-                st.session_state["ytest_col2"] = y_test
-                viz = Visualiser(model, driving_factors, selected_city_2, selected_year)
-                st.session_state["viz_col2"] = viz
+                    # Store results in session state
+                    st.session_state["metrics_col2"] = metrics
+                    st.session_state["ypred_col2"] = y_pred
+                    st.session_state["ytest_col2"] = y_test
+                    viz = Visualiser(model, driving_factors, selected_city_2, selected_year)
+                    st.session_state["viz_col2"] = viz
+                except ValueError as e:
+                    # Catch the specific error and display it to the user
+                    st.error(e)
 
             # Display results of model 2 if available
             if st.session_state["metrics_col2"]:

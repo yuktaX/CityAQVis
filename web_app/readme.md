@@ -19,7 +19,7 @@ This repository contains the code and data for CityAQVis, a machine learning-bas
    ```bash  
    pip install -r requirements.txt  
    ``` 
-2. Clone the `webapp` directory locally and in the terminal run `streamlit run app.py`
+2. Clone the `webapp` directory locally and in the terminal run `streamlit run About_CityAQVis.py`
 3. The app should open in your browser and you must be able to navigate it and use it.
 
 ## Getting Started
