@@ -12,6 +12,7 @@ st.sidebar.markdown("[How to Use](#how-to-use)")
 st.sidebar.markdown("[Technology Stack](#technology-stack)")
 st.sidebar.markdown("[Extend for other Cities](#extension-cities)")
 st.sidebar.markdown("[Future Enhancements](#future-enhancements)")
+st.sidebar.markdown("[Built By](#built-by)") 
 
 st.markdown(""" --- """)
 
@@ -170,14 +171,14 @@ st.markdown(
     """
 )
 
-# Authors and Affiliations Section
+# Built By Section
 st.markdown(""" --- """)
+st.markdown("<a id='built-by'></a>", unsafe_allow_html=True)
 st.header("👩‍💻 Built By")
 
 st.markdown(
     """
-    **Brij Bidhin Desai**, **Yukta Arvind Rajapur**, **Aswathi Mundayatt**,  
-    **Jaya Sreevalsan-Nair**  
+    **Brij Bidhin Desai**, **Yukta Arvind Rajapur**, **Aswathi Mundayatt**, **Jaya Sreevalsan-Nair**  
 
     *Graphics-Visualization-Computing Lab (GVCL),  
     International Institute of Information Technology Bangalore (IIIT-B),  
@@ -185,9 +186,8 @@ st.markdown(
   
     Contact Us: [BrijBidhin.Desai@iiitb.ac.in](mailto:BrijBidhin.Desai@iiitb.ac.in),  
     [Yukta.Rajapur@iiitb.ac.in](mailto:Yukta.Rajapur@iiitb.ac.in),  
-    [aswathimundayatt.valappil003@iiitb.ac.in](mailto:aswathimundayatt.valappil003@iiitb.ac.in),
+    [aswathimundayatt.valappil003@iiitb.ac.in](mailto:aswathimundayatt.valappil003@iiitb.ac.in),  
     [jnair@iiitb.ac.in](mailto:jnair@iiitb.ac.in)  
-
     """,
     unsafe_allow_html=True
 )
