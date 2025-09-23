@@ -169,3 +169,25 @@ st.markdown(
     Dive in and explore the factors influencing air quality with our powerful prediction tool! 🌱
     """
 )
+
+# Authors and Affiliations Section
+st.markdown(""" --- """)
+st.header("👩‍💻 Built By")
+
+st.markdown(
+    """
+    **Brij Bidhin Desai**, **Yukta Arvind Rajapur**, **Aswathi Mundayatt**,  
+    **Jaya Sreevalsan-Nair**  
+
+    *Graphics-Visualization-Computing Lab (GVCL),  
+    International Institute of Information Technology Bangalore (IIIT-B),  
+    26/C Electronics City, Hosur Road, Bangalore, 560100, Karnataka, India.*  
+  
+    Contact Us: [BrijBidhin.Desai@iiitb.ac.in](mailto:BrijBidhin.Desai@iiitb.ac.in),  
+    [Yukta.Rajapur@iiitb.ac.in](mailto:Yukta.Rajapur@iiitb.ac.in),  
+    [aswathimundayatt.valappil003@iiitb.ac.in](mailto:aswathimundayatt.valappil003@iiitb.ac.in),
+    [jnair@iiitb.ac.in](mailto:jnair@iiitb.ac.in)  
+
+    """,
+    unsafe_allow_html=True
+)
