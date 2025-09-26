@@ -1,5 +1,7 @@
 # CityAQVis: Machine Learning Sandbox With Comparative Visual Analytics For Air Quality In Urban Regions Using Multi-Source Data Bangalore Air Pollution Susceptibility Maps
 
+Live demo prototype: [https://cityaqvis-gqj9xf7aqvnj3wkiljvcyf.streamlit.app/](https://cityaqvis-gqj9xf7aqvnj3wkiljvcyf.streamlit.app/)
+
 ## Part 1: Setting up the Dataset, Colab Notebook and training the ML model
 
 - `CityAQVis_Dataset_ML_Model.ipynb` contains the code for the project
